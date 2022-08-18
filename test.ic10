@@ -1,34 +1,10 @@
 # Testing
 alias display1 d0
-alias display2 d1
-alias display3 d2
-alias display4 d3
-alias display5 d4
-alias display6 d5
 
-define BatchModeAverage 0
-define BatchModeSum 1
-
-define OreMiner -2027419821
-define Rocket 1556756312
-define Silo 906210602
-
-sb Silo On 1
-sb OreMiner On 1
+add r0 0 0
 
 start:
-lb r0 Rocket Mode BatchModeAverage
 s display1 Setting r0
-lb r0 Rocket Fuel BatchModeAverage
-s display2 Setting r0
-lb r0 Rocket ReturnFuelCost BatchModeAverage
-s display3 Setting r0
-lb r0 Rocket CollectableGoods BatchModeAverage
-s display4 Setting r0
-lb r0 Silo Quantity BatchModeSum
-s display5 Setting r0
-lb r0 OreMiner Mode BatchModeAverage
-s display6 Setting r0
-
+add r0 r0 1
 yield
 j start
