@@ -201,6 +201,6 @@ add r0 r0 1
 
 start:
 s display1 Setting r0
-add r0 r0 100
+add r0 r0 10
 yield
 j start
