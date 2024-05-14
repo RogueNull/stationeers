@@ -1,0 +1,53 @@
+# Weather Monitor
+alias weatherStation d0 # Weather Station
+alias displayMode d1    # LED Display
+alias displayTime d2    # LED Display
+alias alarm d3          # Klaxon Speaker
+alias light d4          # Flashing Light
+alias transmitter d5    # Logic Transmitter
+
+define KlaxonSpeaker -828056979
+
+setup:
+s displayMode Color 2
+s displayTime Color 2
+s alarm Volume 100
+s alarm On 0
+
+# Modes
+define ALARM 8
+define STORMINCOMING 18
+
+start:
+l r0 weatherStation Mode
+s displayMode Setting r0
+l r0 weatherStation Mode
+beqzal r0 stopAlarm
+l r0 weatherStation Mode
+bnezal r0 triggerAlarm
+l r0 weatherStation NextWeatherEventTime
+s displayTime Setting r0
+
+yield
+j start
+
+stopAlarm:
+s alarm On 0
+s transmitter Setting 0
+sb KlaxonSpeaker On 0
+s light On 0
+j ra
+
+triggerAlarm:
+s light On 1
+sb KlaxonSpeaker On 1
+l r0 alarm On
+beq r0 1 ra
+s alarm On 1
+s transmitter Setting 1
+s alarm Mode STORMINCOMING
+sb KlaxonSpeaker Mode STORMINCOMING
+sleep 2
+s alarm Mode ALARM
+sb KlaxonSpeaker Mode ALARM
+j ra
