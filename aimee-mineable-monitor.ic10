@@ -1,0 +1,15 @@
+# AIMEe mineables monitor
+alias robot d0            # Logic Transmitter
+alias displayQueue d1     # LED Display
+alias displayMineables d2 # LED Display
+
+start:
+j updateDisplays
+
+updateDisplays:
+l r0 robot MineablesInQueue
+s displayQueue Setting r0
+l r0 robot MineablesInVicinity
+s displayMineables Setting r0
+yield
+j updateDisplays
