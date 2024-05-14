@@ -1,0 +1,40 @@
+#AIMEe monitor
+alias robot d0         # Logic Transmitter
+alias displayX d1      # LED Display
+alias displayZ d2      # LED Display
+alias displayMode d3   # LED Display
+alias displayCharge d4 # LED Display
+
+alias mode r1
+alias charge r2
+alias stuck r3
+
+setup:
+s displayCharge Color 5
+s displayCharge Mode 2
+
+# Modes
+define NONE 0
+define KILL 1
+define MOVE 2
+define MINE 3
+define UNLOAD 4
+define PATH 5
+define FULL 6
+
+start:
+j updateDisplays
+
+updateDisplays:
+l r0 robot PositionX
+s displayX Setting r0
+l r0 robot PositionY
+s robot TargetY r0
+l r0 robot PositionZ
+s displayZ Setting r0
+l mode robot Mode
+s displayMode Setting mode
+s displayMode Color mode
+ls charge robot 0 Charge
+s displayCharge Setting charge
+j updateDisplays
