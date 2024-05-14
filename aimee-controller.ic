@@ -1,0 +1,103 @@
+# AIMEe Controller
+alias robot d0          # Logic Transmitter
+alias weatherStation d1 # Weather Station
+
+alias mode r1
+alias charge r2
+alias stuck r3
+
+setup:
+# GPS locations
+# These locations will be different on each world.
+define HOMEX 30
+define HOMEZ 1
+define WAYX 41
+define WAYZ 5
+define UNLOADX 26
+define UNLOADZ 1
+define MINEX 143
+define MINEZ 185
+# Modes
+define NONE 0
+define KILL 1
+define MOVE 2
+define MINE 3
+define UNLOAD 4
+define PATH 5
+define FULL 6
+
+start:
+# travel to unload via waypoint
+s robot TargetX WAYX
+s robot TargetZ WAYZ
+jal travel
+s robot TargetX UNLOADX
+s robot TargetZ UNLOADZ
+jal travel
+s robot Mode UNLOAD
+unloadWait:
+yield
+#check recall
+l r0 weatherStation Mode
+bnez r0 recall
+#check battery
+blt charge 70000 unloadWait
+l mode robot Mode
+beq mode UNLOAD unloadWait
+#travel to mining location via waypoint
+s robot TargetX WAYX
+s robot TargetZ WAYZ
+jal travel
+s robot TargetX MINEX
+s robot TargetZ MINEZ
+jal travel
+#mine until full
+startMining:
+l r0 weatherStation Mode
+bnez r0 recall
+#check for mineables
+l r0 robot MineablesInVicinity
+beqz r0 recall
+s robot Mode MINE
+mineWait:
+yield
+#check recall
+l r0 weatherStation Mode
+bnez r0 recall
+l mode robot Mode
+beq mode MINE mineWait
+bne mode FULL startMining
+j start
+
+travel:
+push ra
+s robot Mode MOVE
+wait:
+yield
+l r0 robot VelocityMagnitude
+slt r0 r0 0.2
+mul stuck stuck r0
+add stuck stuck r0
+bgt stuck 20 pathfind
+l mode robot Mode
+beq mode MOVE wait
+pop ra
+j ra
+
+pathfind:
+s robot Mode PATH
+yield
+sleep 10
+s robot Mode MOVE
+move stuck 0
+j wait
+
+recall:
+s robot TargetX WAYX
+s robot TargetZ WAYZ
+jal travel
+s robot TargetX HOMEX
+s robot TargetZ HOMEZ
+jal travel
+s robot On 0
+j start
